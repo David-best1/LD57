@@ -44,14 +44,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void Rotate()
     {
-        // Повороты по горизонтали и вертикали
-        float horizontalRotation = Input.GetAxis("Mouse X");
-        float verticalRotation = Input.GetAxis("Mouse Y");
+        // Получаем изменения позиции мыши
+        Vector3 mouseMovement = new Vector3(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"), 0f);
 
-        // Вращение по горизонтали
-        transform.Rotate(Vector3.up, horizontalRotation * rotationSpeed * Time.fixedDeltaTime);
+        // Применяем поворот по осям
+        transform.Rotate(Vector3.up, mouseMovement.x * rotationSpeed * Time.fixedDeltaTime); // Горизонтальное вращение
+        transform.Rotate(Vector3.right, -mouseMovement.y * rotationSpeed * Time.fixedDeltaTime); // Вертикальное вращение
 
-        // Вращение по вертикали без ограничений
-        transform.Rotate(Vector3.right, -verticalRotation * rotationSpeed * Time.fixedDeltaTime);
+        // Возвращаем курсор в центр экрана
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 }

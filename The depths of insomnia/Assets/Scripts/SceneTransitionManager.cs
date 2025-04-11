@@ -1,4 +1,4 @@
-using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,30 +13,50 @@ public class SceneTransitionManager : MonoBehaviour
     // Игрок
     public GameObject player;
 
-    // Количество оставшихся монстров
-    private int remainingMonsters;
+    // Список активных монстров
+    private List<GameObject> monsters = new List<GameObject>();
 
     void Start()
     {
-        // Считаем количество всех активных монстров на старте
-        remainingMonsters = GameObject.FindGameObjectsWithTag(monsterTag).Length;
+        // Находим всех активных монстров на старте
+        foreach (var monster in GameObject.FindGameObjectsWithTag(monsterTag))
+        {
+            monsters.Add(monster);
+            Debug.Log($"Монстр {monster.name} добавлен в список.");
+        }
     }
 
     void Update()
     {
-        if (remainingMonsters <= 0)
+        if (monsters.Count <= 0 && IsPlayerNearTrigger())
         {
-            if (Vector3.Distance(player.transform.position, triggerPosition.position) < 2f)
-            {
-                LoadNextScene();
-            }
+            Debug.Log("Все монстры уничтожены и игрок возле триггера. Загружаем новую сцену...");
+            LoadNextScene();
         }
-        remainingMonsters = GameObject.FindGameObjectsWithTag(monsterTag).Length;
+    }
+
+    // Проверяет, находится ли игрок рядом с триггером
+    bool IsPlayerNearTrigger()
+    {
+        var distanceToTrigger = Vector3.Distance(player.transform.position, triggerPosition.position);
+        Debug.Log($"Расстояние до триггера: {distanceToTrigger}");
+        return distanceToTrigger < 5f;
+    }
+
+    // Уменьшение количества оставшихся монстров при уничтожении
+    public void MonsterDestroyed(GameObject monster)
+    {
+        if (monsters.Contains(monster))
+        {
+            monsters.Remove(monster);
+            Debug.Log($"Монстр {monster.name} удален из списка. Осталось монстров: {monsters.Count}");
+        }
     }
 
     // Загрузка следующей сцены
     void LoadNextScene()
     {
+        Debug.Log("Загрузка следующей сцены...");
         SceneManager.LoadScene(1); // Загружаем следующую сцену
     }
 }
